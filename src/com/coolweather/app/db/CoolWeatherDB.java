@@ -11,37 +11,36 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.webkit.WebChromeClient.CustomViewCallback;
 
-public class CoolWeacherDB {
-	// Êı¾İÃû³Æ
+public class CoolWeatherDB {
+	// æ•°æ®åº“å
 	public static final String DB_NAME = "cool_weather";
-	// Êı¾İ°æ±¾
+	// ç‰ˆæœ¬
 	public static final int VERSION = 1;
-	private static CoolWeacherDB coolWeatherDB;
+	private static CoolWeatherDB coolWeatherDB;
 	private SQLiteDatabase db;
 
 	/**
-	 * ½«¹¹Ôì·½·¨Ë½ÓĞ»¯
+	 * å°†æ„é€ æ–¹æ³•ç§æœ‰åŒ–
 	 */
-	public CoolWeacherDB(Context context) {
-		CoolWeacherOpenhelper dbHelper = new CoolWeacherOpenhelper(context,
+	public CoolWeatherDB(Context context) {
+		CoolWeatherOpenHelper dbHelper = new CoolWeatherOpenHelper(context,
 				DB_NAME, null, VERSION);
-		db = dbHelper.getWritableDatabase();// ´´½¨»òÕß´ò¿ªÒ»¸öÏÖÓĞµÄÊı¾İ¿â
+		db = dbHelper.getWritableDatabase();// æ‰“å¼€æˆ–è€…åˆ›å»ºä¸€ä¸ªæ•°æ®
 	}
 
 	/**
-	 * »ñÈ¡CoolWeacherDBµÄÊµÀı µ¥Àı
+	 * è·å–CoolWeacherDBå®ä¾‹
 	 */
-	public synchronized static CoolWeacherDB getInstance(Context context) {
+	public synchronized static CoolWeatherDB getInstance(Context context) {
 		if (coolWeatherDB == null) {
-			coolWeatherDB = new CoolWeacherDB(context);
+			coolWeatherDB = new CoolWeatherDB(context);
 		}
 		return coolWeatherDB;
 	}
 
 	/**
-	 * ½«provinceÊµÀı´æ´¢µ½Êı¾İ¿â
+	 * å°†provinceå­˜å‚¨åˆ°æ•°æ®åº“
 	 */
 	public void saveProvince(Province province) {
 		if (province != null) {
@@ -53,7 +52,7 @@ public class CoolWeacherDB {
 	}
 
 	/**
-	 * ´ÓÊı¾İ¿â¶ÁÈ¡È«¹úËùÓĞµÄÊ¡·İĞÅÏ¢
+	 * è¯»å–å…¨å›½æ‰€æœ‰çš„çœä»½ä¿¡æ¯
 	 */
 	public List<Province> loadProvinces() {
 		List<Province> list = new ArrayList<Province>();
@@ -74,7 +73,7 @@ public class CoolWeacherDB {
 	}
 
 	/**
-	 * ½«CityÊµÀı´æ´¢µ½Êı¾İ¿â
+	 * å°†Cityå­˜å‚¨åˆ°æ•°æ®åº“
 	 */
 	public void saveCity(City city) {
 		if (city != null) {
@@ -87,9 +86,9 @@ public class CoolWeacherDB {
 	}
 
 	/**
-	 * ¶ÁÈ¡Ê¡·İÏÂµÄËùÓĞ³ÇÊĞĞÅÏ¢
+	 * ä»æ•°æ®åº“è¯»å–æŸä¸€çœä»½ä¸‹çš„æ‰€æœ‰åŸå¸‚ä¿¡æ¯
 	 */
-	public List<City> loadCity(int provinceId) {
+	public List<City> loadCities(int provinceId) {
 		List<City> list = new ArrayList<City>();
 		Cursor cursor = db.query("city", null, "province_id=?",
 				new String[] { String.valueOf(provinceId) }, null, null, null);
@@ -98,9 +97,9 @@ public class CoolWeacherDB {
 				City city = new City();
 				city.setId(cursor.getInt(cursor.getColumnIndex("id")));
 				city.setCityName(cursor.getString(cursor
-						.getColumnIndex("cityName")));
+						.getColumnIndex("city_name")));
 				city.setCityCode(cursor.getString(cursor
-						.getColumnIndex("cityCode")));
+						.getColumnIndex("city_code")));
 				city.setProvinceId(provinceId);
 				list.add(city);
 			} while (cursor.moveToNext());
@@ -109,7 +108,7 @@ public class CoolWeacherDB {
 	}
 
 	/**
-	 * ½«CountyÊµÀı´æ´¢µ½Êı¾İ
+	 * å°†Countyå­˜å‚¨åˆ°æ•°æ®åº“
 	 */
 	public void saveCounty(County county) {
 		if (county != null) {
@@ -122,9 +121,9 @@ public class CoolWeacherDB {
 	}
 
 	/**
-	 * ¶ÁÈ¡ÊĞÏÂµÄËùÓĞÏØĞÅÏ¢
+	 * ä»æ•°æ®ä¸­è¯»å–æŸä¸€åŸå¸‚ä¸‹çš„æ‰€æœ‰å¿ä¿¡æ¯
 	 */
-	public List<County> loadCounty(int cityId) {
+	public List<County> loadCounties(int cityId) {
 		List<County> list = new ArrayList<County>();
 		Cursor cursor = db.query("county", null, "city_id=?",
 				new String[] { String.valueOf(cityId) }, null, null, null);
@@ -134,10 +133,11 @@ public class CoolWeacherDB {
 				county.setId(cursor.getInt(cursor.getColumnIndex("id")));
 				county.setCountyName(cursor.getString(cursor
 						.getColumnIndex("county_name")));
-				county.setCountyCode(cursor.getString(cursor.getColumnIndex("county_code")));
+				county.setCountyCode(cursor.getString(cursor
+						.getColumnIndex("county_code")));
 				county.setCityId(cityId);
 				list.add(county);
-			} while (cursor.moveToLast());
+			} while (cursor.moveToNext());
 		}
 		return list;
 	}
